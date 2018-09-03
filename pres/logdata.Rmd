@@ -1,0 +1,215 @@
+---
+title: "Log data in R"
+author: "Steph Locke (@SteffLocke)"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_document: 
+    code_folding: show
+    number_sections: yes
+    toc: yes
+    toc_float: true
+    toc_depth: 2
+---
+
+
+# Read log data
+- readr::read_log is more forgiving than data.table::fread
+
+```{r}
+library(readr)
+rawlogs<-read_log("https://raw.githubusercontent.com/elastic/examples/master/ElasticStack_apache/apache_logs")
+
+library(data.table)
+logs<-data.table(rawlogs)
+knitr::kable(head(logs))
+```
+
+## Rename columns
+Logs usually don't have headers so you need to update the default column titles to something more expressive.
+```{r}
+setnames(logs, colnames(logs)
+         ,c( "ip", "identd", "uname", "time", "request", "status", "respsize", "referer", "agent"))
+# http://stackoverflow.com/questions/9234699/understanding-apache-access-log
+#  %h is the remote host (ie the client IP)
+# %l is the identity of the user determined by identd (not usually # used since not reliable)
+# %u is the user name determined by HTTP authentication
+# %t is the time the request was received.
+# %r is the request line from the client. ("GET / HTTP/1.0")
+# %>s is the status code sent from the server to the client (200, # 404 etc.)
+# %b is the size of the response to the client (in bytes)
+# Referer is the page that linked to this URL.
+# User-agent is the browser identification string.
+
+knitr::kable(head(logs))
+```
+
+
+# Time handling
+There is date handling capability out of the box with R, however, the lubridate package makes it easier to convert strings to dates, and perform manipulations.
+```{r}
+library(lubridate)
+logs[,time:=dmy_hms(time)]
+logs[,`:=`(hour=hour(time), wday=wday(time)
+           ,morning=am(time))]
+logs[ , weekend:= wday %in% c(1,7)]
+```
+
+
+
+# Geolocation packages
+There are few packages for resolving IPs:
+- rgeolocate
+- ggmap
+- iptools
+- ipapi (gh: hrbrmstr/ipapi)
+
+Which one to use depends on API preferences, plus any additional requirements.
+
+> Play it smart - don't call for every record, call for every unique record. Cache values where possible!
+
+```{r}
+if(!require(ipapi)) devtools::install_github("hrbrmstr/ipapi")
+library(ipapi)
+ips<-logs[,unique(ip)]
+
+example<-TRUE
+iptblloc<-"https://raw.githubusercontent.com/stephlocke/lazyCDN/master/sampleIPtbl.csv"
+
+ip_tbl<-if(example) fread(iptblloc) 
+
+#ip_tbl<- ipapi::geolocate(ips)[, status:=NULL]
+
+# Join IP results to log data
+logs<-logs[ip_tbl, on=c(ip="query")]
+head(logs)
+```
+
+# URL handling
+
+The format of the Apache request log means that the request component needs splitting up. The values are not always in quite the right format so you should always check for errors.
+
+```{r}
+logs[,c("verb","url","scheme"):=tstrsplit(request," ")[1:3]]
+
+# isolate issues!
+issues<-logs[,!((verb %like% "^[A-Z]{3,}$")&
+                 (scheme %like% "^HTTP"))]
+errors<-logs[issues,]
+logs<-logs[!issues, ]
+```
+
+```{r}
+library(urltools)
+logs[,c("path","params"):=.(path(url),parameters(url))]
+
+```
+
+# Event steps
+Often you need to worry about steps taken over time. The data.table package gives you an easy way to add IDs to rows or groups.
+```{r}
+logs[order(time),`:=`(order=.SD[,.I], visit=.GRP), .(ip,agent)]
+```
+
+## Most common landing pages
+```{r}
+knitr::kable(logs[order==1,.N,path][
+  order(-N)[1:10],])
+```
+
+## Most common exit pages
+```{r}
+knitr::kable(logs[,.SD[which.max(order)],visit][
+  ,.N,path][order(-N)[1:10],])
+```
+
+## Most common bounce pages
+```{r}
+knitr::kable(logs[,.SD[which.max(order)],visit][
+  order==1,.N,path][order(-N)[1:10],])
+```
+
+## Most common error pages
+```{r}
+logs[status>=500, .N, .(path,status)][order(-N)[1:pmin(10, .N)]]
+```
+
+## Time since last request
+```{r}
+logs[order(order), timesinceprevrequest:= time - shift(time) , visit]
+logs[visit==1, .(order, time, timesinceprevrequest )]
+```
+
+# Visualising
+## Mapping
+```{r}
+library(ggmap)
+ggplot(map_data('world')) +
+  geom_polygon(aes(x = long, y = lat, group = group), fill = 'grey90', colour = 'white') + 
+geom_point(aes(x = lon, y = lat, size = N), color = '#2165B6',
+           data = logs[, .N, .(lon, lat)]) +
+  xlab('') + ylab('') + 
+  theme_minimal() + theme('legend.position' = 'top')
+```
+
+## Heatmap
+```{r}
+library(ggplot2)
+
+heatmap<-function(ggplot,size=20){
+  ggplot+ coord_equal()+
+    geom_tile(color="white", size=0.1)+
+    labs(x=NULL, y=NULL, title=NULL)+
+    scale_x_continuous(breaks=seq(0,24,6))+
+    scale_fill_gradient()
+}
+
+ip_activity<-logs[,.N,.(country,hour)]
+ga<-ggplot(ip_activity[country %like% "^A"], aes(x=hour, y=country, fill=N))
+heatmap(ga)
+
+```
+
+## Flow Diagram
+```{r}
+library(DiagrammeR)
+
+URLids<-logs[,.N,.(labels_col=path)][,nodes:=.I][N>50]
+activity<-URLids[logs, on=c(labels_col="path")][
+  !is.na(nodes),.(visit, order, nodes)]
+
+# Get a cross join of activity
+moves<-activity[activity, on=c("visit"), allow.cartesian=TRUE][
+  # Filter to only include next site
+  order==i.order-1][ 
+    # Get nodes and position
+    ,.(tooltip=.N),.(from=nodes,to=i.nodes)][,penwidth:=10*tooltip/max(tooltip)]
+
+## Bug in DiagrammeR latest v :-/ 
+#
+#gr<-create_graph(URLids, moves)
+#
+#render_graph(gr)
+```
+
+# Time series
+```{r}
+top10<-logs[,.N,country][order(-N)[1:10],country]
+tz_ts<-logs[country %in% top10,.N,.(country, xts::align.time(time,n=60*5))]
+ggplot(tz_ts, aes(x=xts, y=N, group=1))+
+  geom_line()+
+  geom_smooth()+
+  facet_wrap(~country, scales="free_y")
+```
+
+```{r}
+library(xts)
+ts<-logs[order(time),.N,.(time=xts::align.time(time,n=60))]
+xts_df<-xts(ts$N,ts$time)
+plot(xts_df)
+```
+
+```{r}
+devtools::install_github("twitter/AnomalyDetection")
+library(AnomalyDetection)
+AnomalyDetectionTs(setDF(logs[,.N,align.time(time)]), max_anoms=0.05, direction='both',plot=TRUE)
+```

@@ -1,0 +1,298 @@
+---
+title: "SQL intro"
+author: "Steph Locke (@theStephLocke)"
+date:  "`r Sys.Date()`"
+output:
+  revealjs::revealjs_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Steph Locke (@theStephLocke)
+- Locke Data (@LockeData itsaLocke.com)
+- Microsoft AI MVP
+- Author
+
+## Agenda
+ - Databases
+ - Getting rows and columns
+ - Altering columns
+ - Aggregating data
+ - Combining datasets
+ 
+## Prerequisites
+- R & RStudio
+- RSQLite & rmarkdown
+- kaggle.com/gabrio/board-games-dataset
+
+# Databases
+
+## Working with databases in R
+```{r}
+library(DBI)
+library(RSQLite)
+dbConn = dbConnect(SQLite(), "../database.sqlite")
+```
+
+## Our database
+```{r}
+dbListTables(dbConn)
+```
+
+## SQL Chunks
+Use `{sql connection=dbConn}`!
+
+```{sql connection=dbConn}
+select 
+`details.name`, `attributes.boardgamecategory`
+from boardgames 
+limit 10
+```
+
+## Terminology
+- A database is a collection of data
+- A schema is a collection of related data
+- A table is a collection of data on a specific event or entity
+- A column is data on an attribute of the event or entity
+- A row is a unique event or entity
+- A key identifies a unique event or row
+
+## Keys
+- A key is a unique identifier of an entity or row
+- A business key is one or more columns that uniquely describe an entity e.g. first name + last name + DOB
+- A surrogate key is a numeric column that is easier to reference than the business key
+- A primary key is typically the surrogate key
+
+## Exercise
+1. Create a markdown document and connect to the database. 
+2. Can you use the `dbListColumns()` function to find out what columns are in the `boardgames` table?
+
+## Answers
+```{r}
+dbListFields(dbConn,"boardgames")
+```
+
+# Getting rows and columns
+## The core statement
+```{sql connection=dbConn}
+select *
+from boardgames
+limit 10
+```
+
+## Selecting columns
+Use delimiters for bad names!
+```{sql connection=dbConn}
+select 
+`details.name`, 
+`attributes.boardgamecategory`
+from boardgames
+limit 10
+```
+
+## Selecting rows
+```{sql connection=dbConn}
+select 
+`details.name`, 
+`attributes.boardgamecategory`
+from boardgames
+where `attributes.boardgamecategory` like '%nautical%'
+limit 10
+```
+
+## Selecting rows
+```{sql connection=dbConn}
+select 
+`details.name`
+,`attributes.boardgamecategory`
+,`details.maxplayers`
+from boardgames
+where `attributes.boardgamecategory` like '%nautical%'
+and `details.maxplayers` = 2 
+limit 10
+```
+
+## Identifying missings
+```{sql connection=dbConn}
+select 
+`details.name`
+,`attributes.boardgameartist`
+from boardgames
+where `attributes.boardgameartist` is null
+limit 10
+```
+
+## Exercise
+1. Find all games with a `details.minage` of 16 or greater
+2. Find all records where either the `attributes.boardgamedesigner` is missing or the `attributes.boardgameartist` is missing
+
+## Answers
+```{sql connection=dbConn}
+select 
+`details.name`
+,`details.minage`
+from boardgames
+where `details.minage` >= 16
+```
+
+## Answers
+```{sql connection=dbConn}
+select 
+ `details.name`
+,`attributes.boardgamedesigner`
+,`attributes.boardgameartist` 
+from boardgames
+where `attributes.boardgamedesigner` is null 
+or `attributes.boardgameartist` is null
+```
+
+# Altering columns
+## Renaming columns
+```{sql connection=dbConn}
+select 
+`details.name` as `name`
+from boardgames
+limit 10
+```
+
+## Calculated columns
+```{sql connection=dbConn}
+select 
+`details.name` ,substr(`attributes.boardgamecategory`, 1,10) as short_category
+, 1.2 as fixed_colum
+, coalesce(`attributes.boardgameartist`,"Unknown") as arttist
+,case when `attributes.boardgamecategory` like '%nautical%' then 'Boats, boats, boats!'
+when `attributes.boardgamecategory` like '%pirate%' then 'R!' 
+else 'Who cares?' end as category
+from boardgames
+where `attributes.boardgameartist` is null
+limit 10
+```
+
+# Aggregating data
+
+## Grouping data
+```{sql connection=dbConn}
+select 
+`details.maxplayers` as max_players
+from boardgames
+where `details.maxplayers` is not null
+group by `details.maxplayers`
+```
+
+
+## Aggregates
+```{sql connection=dbConn}
+select 
+`details.maxplayers` as max_players
+,count(*) as n
+,avg(`details.playingtime`) as avg_playtime
+,avg(`details.playingtime`)/`details.maxplayers` as pp_avg_playtime
+from boardgames
+where `details.maxplayers` is not null
+group by `details.maxplayers`
+limit 10
+```
+
+## Exercises
+1. How many games received ratings of 0,1,2,...,10 etc based on the ``stats.average` col? (Hint: Use the `floor()` function)
+2. For records with the `game.type` of 'boardgameexpansion' what is the minimum, mean, and maxiumum of users who have said they want the expansion  (`stats.wanted`)?
+
+## Answers
+```{sql connection=dbConn}
+select 
+floor(`stats.average`) as rating
+, count(*) as games
+from boardgames
+group by  floor(`stats.average`)
+```
+
+## Answers
+```{sql connection=dbConn}
+select avg(`stats.wishing` ) as avg_want
+,min(`stats.wishing`) as min_want
+,max(`stats.wishing`) as max_want
+from boardgames
+where `game.type`='boardgameexpansion'
+```
+
+# Combining datasets
+
+## Combination types - inner join
+Use when you need only stuff that matches on both sides
+
+![inner join](https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/inner-join.gif?raw=true)
+
+## Combination types - left join
+Use when you you need to get potentially optional values from another table
+
+![left join](https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/left-join.gif?raw=true)
+
+## Combination types - union (all) 
+Use when you you need to combine two seperate datasets with the same structure
+
+![union](https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/union.gif?raw=true)
+
+## Writing joins
+```{sql connection=dbConn}
+select 
+b.`details.name`
+,t.`topics(bgg.ldaout)`
+from boardgames b
+inner join `bgg.ldaOut.topics` t on b.`details.name`=t.row_names
+limit 10
+```
+
+## Exercises
+1. Use a join to return any boardgames without a topic entry, turn the count of records
+2. Can you transform the boardgame name column so that more entries get joined together? (Hint: Use the replace() function)
+
+## Answers
+```{sql connection=dbConn}
+select 
+count(*)
+from boardgames b
+left join `bgg.ldaOut.topics` t on b.`details.name`=t.row_names
+where t.row_names is null
+```
+
+## Answers
+```{sql connection=dbConn}
+select 
+count(*)
+from boardgames b
+left join `bgg.ldaOut.topics` t on replace(b.`details.name`,' ','.')=t.row_names
+where t.row_names is null
+```
+
+# Wrapup
+
+## Other keywords to learn
+- order by
+- having
+- cross apply
+- with
+
+## Typical execution order of keywords
+1. from
+1. joins
+1. where
+1. group by 
+1. having
+1. select
+1. order by
+1. limit
+
+## Ways to learn SQL
+1. Writing it
+2. Reading other people's code
+3. Using `dbplyr` and checking the code it's written
+4. The SQL Cookbook geni.us/sqlcookbook
+
+## Q&A
+
+## Followup
+1. Get the slides itsalocke.com/talks
+2. Contact me @theStephLocke steph@itsalocke.com

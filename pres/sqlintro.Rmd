@@ -198,7 +198,7 @@ limit 10
 
 ## Exercises
 1. How many games received ratings of 0,1,2,...,10 etc based on the ``stats.average` col? (Hint: Use the `floor()` function)
-2. For records with the `game.type` of 'boardgameexpansion' what is the minimum, mean, and maxiumum of users who have said they want the expansion  (`stats.wanted`)?
+2. For records with the `game.type` of 'boardgameexpansion' what is the minimum, mean, and maximum of users who have said they want the expansion  (`stats.wanted`)?
 
 ## Answers
 ```{sql connection=dbConn}
@@ -231,7 +231,7 @@ Use when you you need to get potentially optional values from another table
 ![left join](https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/left-join.gif?raw=true)
 
 ## Combination types - union (all) 
-Use when you you need to combine two seperate datasets with the same structure
+Use when you you need to combine two separate datasets with the same structure
 
 ![union](https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/union.gif?raw=true)
 
@@ -246,8 +246,8 @@ limit 10
 ```
 
 ## Exercises
-1. Use a join to return any boardgames without a topic entry, turn the count of records
-2. Can you transform the boardgame name column so that more entries get joined together? (Hint: Use the replace() function)
+1. Use a join to return any board games without a topic entry, turn the count of records
+2. Can you transform the board game name column so that more entries get joined together? (Hint: Use the replace() function)
 
 ## Answers
 ```{sql connection=dbConn}

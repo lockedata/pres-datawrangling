@@ -1,0 +1,2674 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Steph Locke (@theStephLocke)" />
+  <meta name="dcterms.date" content="2019-02-18" />
+  <title>SQL intro</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="sqlintro_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="sqlintro_files/reveal.js-3.3.0.1/css/theme/simple.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="lockedata.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">SQL intro</h1>
+    <h2 class="author">Steph Locke (<span class="citation" data-cites="theStephLocke">@theStephLocke</span>)</h2>
+    <h3 class="date">2019-02-18</h3>
+</section>
+
+<section id="steph-locke-thestephlocke" class="slide level2">
+<h2>Steph Locke (<span class="citation" data-cites="theStephLocke">@theStephLocke</span>)</h2>
+<ul>
+<li>Locke Data (<span class="citation" data-cites="LockeData">@LockeData</span> itsaLocke.com)</li>
+<li>Microsoft AI MVP</li>
+<li>Author</li>
+</ul>
+</section>
+<section id="agenda" class="slide level2">
+<h2>Agenda</h2>
+<ul>
+<li>Databases</li>
+<li>Getting rows and columns</li>
+<li>Altering columns</li>
+<li>Aggregating data</li>
+<li>Combining datasets</li>
+</ul>
+</section>
+<section id="prerequisites" class="slide level2">
+<h2>Prerequisites</h2>
+<ul>
+<li>R &amp; RStudio</li>
+<li>RSQLite &amp; rmarkdown</li>
+<li>kaggle.com/gabrio/board-games-dataset</li>
+</ul>
+</section>
+<section><section id="databases" class="titleslide slide level1"><h1>Databases</h1></section><section id="working-with-databases-in-r" class="slide level2">
+<h2>Working with databases in R</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DBI)
+<span class="kw">library</span>(RSQLite)
+dbConn =<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw">SQLite</span>(), <span class="st">&quot;../database.sqlite&quot;</span>)</code></pre></div>
+</section><section id="our-database" class="slide level2">
+<h2>Our database</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbListTables</span>(dbConn)</code></pre></div>
+<pre><code>## [1] &quot;BoardGames&quot;               &quot;bgg.ldaOut.top.documents&quot;
+## [3] &quot;bgg.ldaOut.top.terms&quot;     &quot;bgg.ldaOut.topics&quot;       
+## [5] &quot;bgg.topics&quot;</code></pre>
+</section><section id="sql-chunks" class="slide level2">
+<h2>SQL Chunks</h2>
+<p>Use <code>{sql connection=dbConn}</code>!</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`, `attributes.boardgamecategory`
+<span class="kw">from</span> boardgames 
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgamecategory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Die Macher</td>
+<td style="text-align: left;">Economic,Negotiation,Political</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dragonmaster</td>
+<td style="text-align: left;">Card Game,Fantasy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Samurai</td>
+<td style="text-align: left;">Abstract Strategy,Medieval</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: left;">Ancient</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acquire</td>
+<td style="text-align: left;">Economic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mare Mediterraneum</td>
+<td style="text-align: left;">Civilization,Nautical</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cathedral</td>
+<td style="text-align: left;">Abstract Strategy</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lords of Creation</td>
+<td style="text-align: left;">Civilization,Fantasy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">El Caballero</td>
+<td style="text-align: left;">Exploration</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Elfenland</td>
+<td style="text-align: left;">Fantasy,Travel</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="terminology" class="slide level2">
+<h2>Terminology</h2>
+<ul>
+<li>A database is a collection of data</li>
+<li>A schema is a collection of related data</li>
+<li>A table is a collection of data on a specific event or entity</li>
+<li>A column is data on an attribute of the event or entity</li>
+<li>A row is a unique event or entity</li>
+<li>A key identifies a unique event or row</li>
+</ul>
+</section><section id="keys" class="slide level2">
+<h2>Keys</h2>
+<ul>
+<li>A key is a unique identifier of an entity or row</li>
+<li>A business key is one or more columns that uniquely describe an entity e.g. first name + last name + DOB</li>
+<li>A surrogate key is a numeric column that is easier to reference than the business key</li>
+<li>A primary key is typically the surrogate key</li>
+</ul>
+</section><section id="exercise" class="slide level2">
+<h2>Exercise</h2>
+<ol type="1">
+<li>Create a markdown document and connect to the database.</li>
+<li>Can you use the <code>dbListColumns()</code> function to find out what columns are in the <code>boardgames</code> table?</li>
+</ol>
+</section><section id="answers" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbListFields</span>(dbConn,<span class="st">&quot;boardgames&quot;</span>)</code></pre></div>
+<pre><code>##  [1] &quot;row_names&quot;                               
+##  [2] &quot;game.id&quot;                                 
+##  [3] &quot;game.type&quot;                               
+##  [4] &quot;details.description&quot;                     
+##  [5] &quot;details.image&quot;                           
+##  [6] &quot;details.maxplayers&quot;                      
+##  [7] &quot;details.maxplaytime&quot;                     
+##  [8] &quot;details.minage&quot;                          
+##  [9] &quot;details.minplayers&quot;                      
+## [10] &quot;details.minplaytime&quot;                     
+## [11] &quot;details.name&quot;                            
+## [12] &quot;details.playingtime&quot;                     
+## [13] &quot;details.thumbnail&quot;                       
+## [14] &quot;details.yearpublished&quot;                   
+## [15] &quot;attributes.boardgameartist&quot;              
+## [16] &quot;attributes.boardgamecategory&quot;            
+## [17] &quot;attributes.boardgamecompilation&quot;         
+## [18] &quot;attributes.boardgamedesigner&quot;            
+## [19] &quot;attributes.boardgameexpansion&quot;           
+## [20] &quot;attributes.boardgamefamily&quot;              
+## [21] &quot;attributes.boardgameimplementation&quot;      
+## [22] &quot;attributes.boardgameintegration&quot;         
+## [23] &quot;attributes.boardgamemechanic&quot;            
+## [24] &quot;attributes.boardgamepublisher&quot;           
+## [25] &quot;attributes.total&quot;                        
+## [26] &quot;stats.average&quot;                           
+## [27] &quot;stats.averageweight&quot;                     
+## [28] &quot;stats.bayesaverage&quot;                      
+## [29] &quot;stats.family.abstracts.bayesaverage&quot;     
+## [30] &quot;stats.family.abstracts.pos&quot;              
+## [31] &quot;stats.family.cgs.bayesaverage&quot;           
+## [32] &quot;stats.family.cgs.pos&quot;                    
+## [33] &quot;stats.family.childrensgames.bayesaverage&quot;
+## [34] &quot;stats.family.childrensgames.pos&quot;         
+## [35] &quot;stats.family.familygames.bayesaverage&quot;   
+## [36] &quot;stats.family.familygames.pos&quot;            
+## [37] &quot;stats.family.partygames.bayesaverage&quot;    
+## [38] &quot;stats.family.partygames.pos&quot;             
+## [39] &quot;stats.family.strategygames.bayesaverage&quot; 
+## [40] &quot;stats.family.strategygames.pos&quot;          
+## [41] &quot;stats.family.thematic.bayesaverage&quot;      
+## [42] &quot;stats.family.thematic.pos&quot;               
+## [43] &quot;stats.family.wargames.bayesaverage&quot;      
+## [44] &quot;stats.family.wargames.pos&quot;               
+## [45] &quot;stats.median&quot;                            
+## [46] &quot;stats.numcomments&quot;                       
+## [47] &quot;stats.numweights&quot;                        
+## [48] &quot;stats.owned&quot;                             
+## [49] &quot;stats.stddev&quot;                            
+## [50] &quot;stats.subtype.boardgame.bayesaverage&quot;    
+## [51] &quot;stats.subtype.boardgame.pos&quot;             
+## [52] &quot;stats.trading&quot;                           
+## [53] &quot;stats.usersrated&quot;                        
+## [54] &quot;stats.wanting&quot;                           
+## [55] &quot;stats.wishing&quot;                           
+## [56] &quot;polls.language_dependence&quot;               
+## [57] &quot;polls.suggested_numplayers.1&quot;            
+## [58] &quot;polls.suggested_numplayers.10&quot;           
+## [59] &quot;polls.suggested_numplayers.2&quot;            
+## [60] &quot;polls.suggested_numplayers.3&quot;            
+## [61] &quot;polls.suggested_numplayers.4&quot;            
+## [62] &quot;polls.suggested_numplayers.5&quot;            
+## [63] &quot;polls.suggested_numplayers.6&quot;            
+## [64] &quot;polls.suggested_numplayers.7&quot;            
+## [65] &quot;polls.suggested_numplayers.8&quot;            
+## [66] &quot;polls.suggested_numplayers.9&quot;            
+## [67] &quot;polls.suggested_numplayers.Over&quot;         
+## [68] &quot;polls.suggested_playerage&quot;               
+## [69] &quot;attributes.t.links.concat.2....&quot;         
+## [70] &quot;stats.family.amiga.bayesaverage&quot;         
+## [71] &quot;stats.family.amiga.pos&quot;                  
+## [72] &quot;stats.family.arcade.bayesaverage&quot;        
+## [73] &quot;stats.family.arcade.pos&quot;                 
+## [74] &quot;stats.family.atarist.bayesaverage&quot;       
+## [75] &quot;stats.family.atarist.pos&quot;                
+## [76] &quot;stats.family.commodore64.bayesaverage&quot;   
+## [77] &quot;stats.family.commodore64.pos&quot;            
+## [78] &quot;stats.subtype.rpgitem.bayesaverage&quot;      
+## [79] &quot;stats.subtype.rpgitem.pos&quot;               
+## [80] &quot;stats.subtype.videogame.bayesaverage&quot;    
+## [81] &quot;stats.subtype.videogame.pos&quot;</code></pre>
+</section></section>
+<section><section id="getting-rows-and-columns" class="titleslide slide level1"><h1>Getting rows and columns</h1></section><section id="the-core-statement" class="slide level2">
+<h2>The core statement</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> *
+<span class="kw">from</span> boardgames
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">row_names</th>
+<th style="text-align: left;">game.id</th>
+<th style="text-align: left;">game.type</th>
+<th style="text-align: left;">details.description</th>
+<th style="text-align: left;">details.image</th>
+<th style="text-align: right;">details.maxplayers</th>
+<th style="text-align: right;">details.maxplaytime</th>
+<th style="text-align: right;">details.minage</th>
+<th style="text-align: right;">details.minplayers</th>
+<th style="text-align: right;">details.minplaytime</th>
+<th style="text-align: left;">details.name</th>
+<th style="text-align: right;">details.playingtime</th>
+<th style="text-align: left;">details.thumbnail</th>
+<th style="text-align: right;">details.yearpublished</th>
+<th style="text-align: left;">attributes.boardgameartist</th>
+<th style="text-align: left;">attributes.boardgamecategory</th>
+<th style="text-align: left;">attributes.boardgamecompilation</th>
+<th style="text-align: left;">attributes.boardgamedesigner</th>
+<th style="text-align: left;">attributes.boardgameexpansion</th>
+<th style="text-align: left;">attributes.boardgamefamily</th>
+<th style="text-align: left;">attributes.boardgameimplementation</th>
+<th style="text-align: left;">attributes.boardgameintegration</th>
+<th style="text-align: left;">attributes.boardgamemechanic</th>
+<th style="text-align: left;">attributes.boardgamepublisher</th>
+<th style="text-align: right;">attributes.total</th>
+<th style="text-align: right;">stats.average</th>
+<th style="text-align: right;">stats.averageweight</th>
+<th style="text-align: right;">stats.bayesaverage</th>
+<th style="text-align: right;">stats.family.abstracts.bayesaverage</th>
+<th style="text-align: right;">stats.family.abstracts.pos</th>
+<th style="text-align: right;">stats.family.cgs.bayesaverage</th>
+<th style="text-align: right;">stats.family.cgs.pos</th>
+<th style="text-align: right;">stats.family.childrensgames.bayesaverage</th>
+<th style="text-align: right;">stats.family.childrensgames.pos</th>
+<th style="text-align: right;">stats.family.familygames.bayesaverage</th>
+<th style="text-align: right;">stats.family.familygames.pos</th>
+<th style="text-align: right;">stats.family.partygames.bayesaverage</th>
+<th style="text-align: right;">stats.family.partygames.pos</th>
+<th style="text-align: right;">stats.family.strategygames.bayesaverage</th>
+<th style="text-align: right;">stats.family.strategygames.pos</th>
+<th style="text-align: right;">stats.family.thematic.bayesaverage</th>
+<th style="text-align: right;">stats.family.thematic.pos</th>
+<th style="text-align: right;">stats.family.wargames.bayesaverage</th>
+<th style="text-align: right;">stats.family.wargames.pos</th>
+<th style="text-align: right;">stats.median</th>
+<th style="text-align: right;">stats.numcomments</th>
+<th style="text-align: right;">stats.numweights</th>
+<th style="text-align: right;">stats.owned</th>
+<th style="text-align: right;">stats.stddev</th>
+<th style="text-align: right;">stats.subtype.boardgame.bayesaverage</th>
+<th style="text-align: right;">stats.subtype.boardgame.pos</th>
+<th style="text-align: right;">stats.trading</th>
+<th style="text-align: right;">stats.usersrated</th>
+<th style="text-align: right;">stats.wanting</th>
+<th style="text-align: right;">stats.wishing</th>
+<th style="text-align: left;">polls.language_dependence</th>
+<th style="text-align: left;">polls.suggested_numplayers.1</th>
+<th style="text-align: left;">polls.suggested_numplayers.10</th>
+<th style="text-align: left;">polls.suggested_numplayers.2</th>
+<th style="text-align: left;">polls.suggested_numplayers.3</th>
+<th style="text-align: left;">polls.suggested_numplayers.4</th>
+<th style="text-align: left;">polls.suggested_numplayers.5</th>
+<th style="text-align: left;">polls.suggested_numplayers.6</th>
+<th style="text-align: left;">polls.suggested_numplayers.7</th>
+<th style="text-align: left;">polls.suggested_numplayers.8</th>
+<th style="text-align: left;">polls.suggested_numplayers.9</th>
+<th style="text-align: left;">polls.suggested_numplayers.Over</th>
+<th style="text-align: left;">polls.suggested_playerage</th>
+<th style="text-align: left;">attributes.t.links.concat.2….</th>
+<th style="text-align: right;">stats.family.amiga.bayesaverage</th>
+<th style="text-align: right;">stats.family.amiga.pos</th>
+<th style="text-align: right;">stats.family.arcade.bayesaverage</th>
+<th style="text-align: right;">stats.family.arcade.pos</th>
+<th style="text-align: right;">stats.family.atarist.bayesaverage</th>
+<th style="text-align: right;">stats.family.atarist.pos</th>
+<th style="text-align: right;">stats.family.commodore64.bayesaverage</th>
+<th style="text-align: right;">stats.family.commodore64.pos</th>
+<th style="text-align: right;">stats.subtype.rpgitem.bayesaverage</th>
+<th style="text-align: right;">stats.subtype.rpgitem.pos</th>
+<th style="text-align: right;">stats.subtype.videogame.bayesaverage</th>
+<th style="text-align: right;">stats.subtype.videogame.pos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">Die Macher is a game about seven sequential political races in different regions of Germany. Players are in charge of national political parties, and must manage limited resources to help their party to victory. The winning party will have the most victory points after all the regional elections. There are four different ways of scoring victory points. First, each regional election can supply one to eighty victory points, depending on the size of the region and how well your party does in it. Second, if a party wins a regional election and has some media influence in the region, then the party will receive some media-control victory points. Third, each party has a national party membership which will grow as the game progresses and this will supply a fair number of victory points. Lastly, parties score some victory points if their party platform matches the national opinions at the end of the game.
+
+The 1986 edition featured 4 parties from the old West Germany and supported 3-4 players. The 1997 edition supports up to 5 players in the re-united Germany and updated several features of the rules as well. The 2006 edition also supports up to 5 players and adds a shorter 5 round variant and additional rules updates by the original designer.
+
+Die Macher is #1 in the Valley Games Classic Line
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic159509.jpg</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: left;">Die Macher</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic159509_t.jpg</td>
+<td style="text-align: right;">1986</td>
+<td style="text-align: left;">Marcus Gschwendtner</td>
+<td style="text-align: left;">Economic,Negotiation,Political</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Karl-Heinz Schmiel</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Country: Germany,Valley Games Classic Line</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Area Control / Area Influence,Auction/Bidding,Dice Rolling,Hand Management,Simultaneous Action Selection</td>
+<td style="text-align: left;">Hans im Glück Verlags-GmbH,Moskito Spiele,Valley Games, Inc.</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7.66508</td>
+<td style="text-align: right;">4.3477</td>
+<td style="text-align: right;">7.29168</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">7.39570</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1763</td>
+<td style="text-align: right;">719</td>
+<td style="text-align: right;">5251</td>
+<td style="text-align: right;">1.59321</td>
+<td style="text-align: right;">7.29168</td>
+<td style="text-align: right;">147</td>
+<td style="text-align: right;">170</td>
+<td style="text-align: right;">4498</td>
+<td style="text-align: right;">505</td>
+<td style="text-align: right;">1654</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">Dragonmaster is a trick-taking card game based on an older game called Coup d’etat. Each player is given a supply of plastic gems, which represent points. Each player will get to be the dealer for five different hands, with slightly different goals for each hand. After all cards have been dealt out, the dealer decides which hand best suits his or her current cards, and the other players are penalized points (in the form of crystals) for taking certain tricks or cards. For instance, if “first” or “last” is called, then a player is penalized for taking the first or last tricks. All players will get a chance to be dealer for five hands, but other players can steal this opportunity by taking all of the tricks during certain hands. At the end, the biggest pile of gems wins the game.
+
+Jewel contents:
+
+11 clear (3 extra)
+13 green (1 extra)
+22 red (2 extra)
+22 blue (2 extra)
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic184174.jpg</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">Dragonmaster</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic184174_t.jpg</td>
+<td style="text-align: right;">1981</td>
+<td style="text-align: left;">Bob Pepper</td>
+<td style="text-align: left;">Card Game,Fantasy</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">G. W. “Jerry” D’Arcey</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Animals: Dragons</td>
+<td style="text-align: left;">Indulgence,Coup d’etat</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Trick-taking</td>
+<td style="text-align: left;">E.S. Lowe,Milton Bradley</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">6.60815</td>
+<td style="text-align: right;">1.9423</td>
+<td style="text-align: right;">5.87150</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">5.91318</td>
+<td style="text-align: right;">1066</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">273</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">1.46282</td>
+<td style="text-align: right;">5.87150</td>
+<td style="text-align: right;">2541</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">478</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: left;">Some</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">Part of the Knizia tile-laying trilogy, Samurai is set in medieval Japan. Players compete to gain the favor of three factions: samurai, peasants, and priests, which are represented by helmet, rice paddy, and Buddha tokens scattered about the board, which features the islands of Japan. The competition is waged through the use of hexagonal tiles, each of which help curry favor of one of the three factions — or all three at once! Players can make lightning-quick strikes with horseback ronin and ships or approach their conquests more methodically. As each token (helmets, rice paddies, and Buddhas) is surrounded, it is awarded to the player who has gained the most favor with the corresponding group.
+
+Gameplay continues until all the symbols of one type have been removed from the board or four tokens have been removed from play due to a tie for influence.
+
+At the end of the game, players compare captured symbols of each type, competing for majorities in each of the three types. Ties are not uncommon and are broken based on the number of other, “non-majority” symbols each player has collected.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic3211873.jpg</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">Samurai</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic3211873_t.jpg</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: left;">Franz Vohwinkel</td>
+<td style="text-align: left;">Abstract Strategy,Medieval</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Reiner Knizia</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Asian Theme,Country: Japan,Knizia tile-laying trilogy,Samurai</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Area Control / Area Influence,Hand Management,Set Collection,Tile Placement</td>
+<td style="text-align: left;">999 Games,ABACUSSPIELE,Astrel Games,Ceilikan Jogos,Descartes Editeur,Edge Entertainment,Fantasy Flight Games,Galakta,Hans im Glück Verlags-GmbH,Hobby Japan,Lacerta,Lautapelit.fi,Rio Grande Games,Skandinavisk Spil Kompagni,Wargames Club Publishing</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7.44119</td>
+<td style="text-align: right;">2.5085</td>
+<td style="text-align: right;">7.28295</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">7.30610</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3281</td>
+<td style="text-align: right;">1355</td>
+<td style="text-align: right;">11870</td>
+<td style="text-align: right;">1.18531</td>
+<td style="text-align: right;">7.28295</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">234</td>
+<td style="text-align: right;">12019</td>
+<td style="text-align: right;">707</td>
+<td style="text-align: right;">2601</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">When you see the triangular box and the luxurious, large blocks, you can tell this game was designed to be beautiful as well as functional. The object of the game is to build pyramids out of the different colored blocks. A pyramid scores more points when it’s made from a few colors, but it’s much harder to consistently outbid the other players for the necessary blocks. The game is over when the Pharoah’s Pyramid in the center is completed, which is built using all the blocks that the players don’t use during the course of the game.
+
+Final round 1990 Hippodice Spieleautorenwettbewerb.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic285299.jpg</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic285299_t.jpg</td>
+<td style="text-align: right;">1992</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Ancient</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Christian Beierer</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Country: Egypt,Promotional Board Games</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Action Point Allowance System,Area Control / Area Influence,Auction/Bidding,Set Collection</td>
+<td style="text-align: left;">KOSMOS</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6.60675</td>
+<td style="text-align: right;">2.6667</td>
+<td style="text-align: right;">5.76636</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">111</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">523</td>
+<td style="text-align: right;">1.21028</td>
+<td style="text-align: right;">5.76636</td>
+<td style="text-align: right;">3191</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">314</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">In Acquire, each player strategically invests in businesses, trying to retain a majority of stock. As the businesses grow with tile placements, they also start merging, giving the majority stockholders of the acquired business sizable bonuses, which can then be used to reinvest into other chains. All of the investors in the acquired company can then cash in their stocks for current value or trade them 2-for-1 for shares of the newer, larger business. The game is a race to acquire the greatest wealth.
+
+This Sid Sackson classic has taken many different forms over the years depending on the publisher. Some versions of the 3M bookshelf edition included rules for a 2-player variant. The original version is part of the 3M Bookshelf Series.
+
+Note: many books and websites list this as a 1962 publication. This is incorrect; information from Sid Sackson’s diaries, correspondence, and royalty statements prove that it was published in 1964. However, for some reason admins continue to accept “corrections” of the publication date to 1962. A detailed timeline of the development and publication of the game can be found at <a href="https://opinionatedgamers.com/2014/05/29/how-acquire-became-acquire/" class="uri">https://opinionatedgamers.com/2014/05/29/how-acquire-became-acquire/</a>, for those interested.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic342163.jpg</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">Acquire</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic342163_t.jpg</td>
+<td style="text-align: right;">1964</td>
+<td style="text-align: left;">Scott Okumura,Peter Whitley</td>
+<td style="text-align: left;">Economic</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Sid Sackson</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">3M Bookshelf Series</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Hand Management,Stock Holding,Tile Placement</td>
+<td style="text-align: left;">3M,Avalon Hill,Avalon Hill (Hasbro),Dujardin,Grow Jogos e Brinquedos,PS-Games,Schmidt France,Schmidt International,Schmidt Spiele,Selecta Spel en Hobby,Smart Games, Inc.</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7.35830</td>
+<td style="text-align: right;">2.5089</td>
+<td style="text-align: right;">7.21895</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">7.21696</td>
+<td style="text-align: right;">141</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5011</td>
+<td style="text-align: right;">1515</td>
+<td style="text-align: right;">18682</td>
+<td style="text-align: right;">1.33020</td>
+<td style="text-align: right;">7.21895</td>
+<td style="text-align: right;">181</td>
+<td style="text-align: right;">823</td>
+<td style="text-align: right;">15195</td>
+<td style="text-align: right;">516</td>
+<td style="text-align: right;">2219</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">In the ancient lands along the Mediterranean, players attempt to satisfy their unique victory conditions via trade, war and construction. This lavishly produced game contains tons of wooden game components and a beautiful roll-out vinyl map. Players produce a score of different commodities to trade with other cities in the hope of creating enough income to fill their capitals with buildings, produce artwork, and fill warehouses with goods.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic28424.jpg</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: left;">Mare Mediterraneum</td>
+<td style="text-align: right;">240</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic28424_t.jpg</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: left;">Jean du Poël</td>
+<td style="text-align: left;">Civilization,Nautical</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Jean du Poël</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Cities: Marseille</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Dice Rolling</td>
+<td style="text-align: left;">Historien Spiele Galerie (Historien Spielegalerie)</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6.52534</td>
+<td style="text-align: right;">3.0000</td>
+<td style="text-align: right;">5.57250</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">106</td>
+<td style="text-align: right;">1.65064</td>
+<td style="text-align: right;">5.57250</td>
+<td style="text-align: right;">6621</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">Some</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">In Cathedral, each player has a set of pieces of a different color. The pieces are in the shapes of buildings, covering from one to five square units. The first player takes the single neutral Cathedral piece and places it onto the board. Players then alternate placing one of their buildings onto the board until neither player can place another building. Players capture territory by surrounding areas that are occupied by at most one opponent or neutral building. A captured piece is removed and captured territory becomes off-limits to the opponent. The player with the fewest ‘square units’ of buildings that can’t be placed wins.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic181642.jpg</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">Cathedral</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic181642_t.jpg</td>
+<td style="text-align: right;">1978</td>
+<td style="text-align: left;">S. Mattusek</td>
+<td style="text-align: left;">Abstract Strategy</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Robert P. Moore</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Combinatorial,Polyominoes</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Area Enclosure,Pattern Building,Pattern Recognition,Tile Placement</td>
+<td style="text-align: left;">Brightway Products Ltd,Falomir Juegos,Family Games, Inc.,Gazebo Games UK Ltd.,Gigamic,Holzinsel,Lagoon Games,Mattel,Robert P. Moore Games,Yangxin Industrial Company Limited</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6.50534</td>
+<td style="text-align: right;">1.8217</td>
+<td style="text-align: right;">6.21877</td>
+<td style="text-align: right;">6.32724</td>
+<td style="text-align: right;">109</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1076</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: right;">4561</td>
+<td style="text-align: right;">1.31078</td>
+<td style="text-align: right;">6.21877</td>
+<td style="text-align: right;">1352</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: right;">2751</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">In this interesting offering from Warfrog, players become Gods seeking to dominate a world with their followers. The first part of the game involves constructing the game board, after which players take turns using cards to determine how many new people should appear and what type of terrain they will inhabit. All tribes start off as barbarians, but soon the calming effect of civilization settles the marauding bands; although civilized tribes score more, they can no longer attack. What they can do, though, is civilize other players’ followers. Sure it gives opponents more points, but at least those followers won’t come after you!
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic374320.jpg</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">Lords of Creation</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic374320_t.jpg</td>
+<td style="text-align: right;">1993</td>
+<td style="text-align: left;">Bryan King</td>
+<td style="text-align: left;">Civilization,Fantasy</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Martin Wallace</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Modular Board</td>
+<td style="text-align: left;">Vendetta,Warfrog Games</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6.14538</td>
+<td style="text-align: right;">2.4000</td>
+<td style="text-align: right;">5.60857</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">460</td>
+<td style="text-align: right;">1.25508</td>
+<td style="text-align: right;">5.60857</td>
+<td style="text-align: right;">5371</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">186</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">Although referred to as a sequel to El Grande, El Caballero shares few aspects with its namesake, being a fun but intense brain-burner in which players explore and attempt to control the lands and waterways of the New World.
+
+The players are following Columbus by exploring the islands he discovered. Players slowly explore the islands – by picking and placing land tiles that are most favorable to them – and discover wealth in the form of gold and fish. As they learn about the land and sea areas of this new land, they position their caballeros to try to maintain control of the important regions. Castillos give them a measure of protection from others, and ships allow them to establish trade and to fish for food. Success is measured in the size of land and sea areas they control. Their success is measured twice, and in the end these scores are summed and the winner declared.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic1731731.jpg</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">El Caballero</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic1731731_t.jpg</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: left;">Doris Matthäus</td>
+<td style="text-align: left;">Exploration</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Wolfgang Kramer,Richard Ulrich</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">El Grande</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Area Control / Area Influence,Tile Placement</td>
+<td style="text-align: left;">999 Games,Hans im Glück Verlags-GmbH,Rio Grande Games</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6.51776</td>
+<td style="text-align: right;">3.1958</td>
+<td style="text-align: right;">6.07659</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">6.16406</td>
+<td style="text-align: right;">833</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">529</td>
+<td style="text-align: right;">143</td>
+<td style="text-align: right;">2263</td>
+<td style="text-align: right;">1.40413</td>
+<td style="text-align: right;">6.07659</td>
+<td style="text-align: right;">1711</td>
+<td style="text-align: right;">141</td>
+<td style="text-align: right;">1263</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">319</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">boardgame</td>
+<td style="text-align: left;">Elfenland is a redesign of the original White Wind game Elfenroads. The game is set in the mythical world of the elves. A group of fledgling elves (the players) are charged with visiting as many of the twenty Elfencities as they can over the course of 4 rounds. To accomplish the task they will use various forms of transportation such as Giant Pigs, Elfcarts, Unicorns, Rafts, Magic Clouds, Trollwagons, and Dragons.
+
+Gameplay: Players begin in the Elf capitol, draw one face down movement tile, and are dealt eight transport cards and a secret ‘home’ city card that they must reach at the end of the 4th round or lose points for each city space away from ‘home’ they are at the end of the game. Markers of each player’s color are placed in each city on the board and are collected when the player visits that city (each counts as 1 point).
+ 
+ The round proceeds in 2 stages. The first part of the round consists of the drawing of Tiles showing the differing types of transport (except rafts) from a combination of face up and face down tiles (if a player doesn’t like the 5 tiles that are face up; they can always draw blind from the face down tiles and hope to get one they need). These transport tiles need to match the Transportation cards in your hand to use them most effectively. After each player has a total of 4 tiles they take turns placing a tile on any one of the roads that run between the elf cities. Only one transport tile may be placed on each road; so players may use other players tiles to travel if they have the matching cards in their hand. This frequently causes a readjustment of planned travel routes as other players tiles can allow you to move farther or shorter than you had first thought. Players can play their tiles to help themselves or hinder others by playing a slow mode of transport on another players (perceived) path.
+
+Each mode of transport has certain terrain it can travel through quickly or slowly, and those that it cannot. These are listed on the top of each transportation card by the number terrain symbols. The number of terrain symbols equals how many matching cards you must play to move across a given tile in a given terrain. For example, a Magic Cloud tile placed in a mountain would take one Magic cloud card to travel across (1 mountain symbol on card means Magic clouds are fast in mountains). If the same tile was placed on a road in forest terrain it would require 2 Magic Cloud cards to travel that route (2 Forest symbols on card means Magic Clouds are slow in Forest). Magic Clouds cannot travel in desert terrain at all (no desert symbols on card). All modes of transport are different and Rafts can be used on rivers or lakes without needing tiles. Rafts go slow upstream (2 raft cards needed) and fast downstream (1 card needed). The small lake requires 1 raft card to travel across and the larger lake requires 2 cards to travel across. Players may keep one unused transport counter and up to 4 Transportation cards from one round to the next.
+
+The second part of the round begins after all players have finished placing their transportation tiles for the round. Each player plays his cards and moves his elf-boot around the board collecting his tokens from the cities visited. If there is a Transport tile on a route and a player has no matching Transportation card he may ‘Caravan’ across it by playing any 3 Transportation cards from his hand.
+
+As a bit of ‘take that’ each player has a trouble tile which can be placed next to any transportation tile during the first part of the round. This counter means that in order to travel that path an additional card of the transport type must be played or 4 cards to ‘Caravan’.
+
+Victory: if at the end of round 3 a player has visited all 20 cities he is the winner. If not the game ends after round 4 when ‘Home’ cities are revealed and each player subtracts points for each city he is away from his ‘home’ subtracting that from his collected city tokens. The person with the highest score wins.
+
+</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic1798136.jpg</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">Elfenland</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">//cf.geekdo-images.com/images/pic1798136_t.jpg</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: left;">Doris Matthäus</td>
+<td style="text-align: left;">Fantasy,Travel</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Alan R. Moon</td>
+<td style="text-align: left;">Elfengold,Elfenland: Back to the Roads,Elfenland: Der Elfen-Zauberer,Stadt Land Spielt Limitierte Sonderdrucke 2013</td>
+<td style="text-align: left;">Elfen Travel,Fairies, Elves and Pixies</td>
+<td style="text-align: left;">Elfenroads,Elfenroads</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Card Drafting,Hand Management,Point to Point Movement,Route/Network Building</td>
+<td style="text-align: left;">999 Games,AMIGO Spiel + Freizeit GmbH,Corfix,Hobby World,Midgaard Games,Rio Grande Games</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">6.74996</td>
+<td style="text-align: right;">2.1649</td>
+<td style="text-align: right;">6.58428</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">6.62779</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1864</td>
+<td style="text-align: right;">661</td>
+<td style="text-align: right;">7792</td>
+<td style="text-align: right;">1.24616</td>
+<td style="text-align: right;">6.58428</td>
+<td style="text-align: right;">709</td>
+<td style="text-align: right;">267</td>
+<td style="text-align: right;">6729</td>
+<td style="text-align: right;">182</td>
+<td style="text-align: right;">679</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Best</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">Recommended</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NotRecommended</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="selecting-columns" class="slide level2">
+<h2>Selecting columns</h2>
+<p>Use delimiters for bad names!</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`, 
+`attributes.boardgamecategory`
+<span class="kw">from</span> boardgames
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgamecategory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Die Macher</td>
+<td style="text-align: left;">Economic,Negotiation,Political</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dragonmaster</td>
+<td style="text-align: left;">Card Game,Fantasy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Samurai</td>
+<td style="text-align: left;">Abstract Strategy,Medieval</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: left;">Ancient</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acquire</td>
+<td style="text-align: left;">Economic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mare Mediterraneum</td>
+<td style="text-align: left;">Civilization,Nautical</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cathedral</td>
+<td style="text-align: left;">Abstract Strategy</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lords of Creation</td>
+<td style="text-align: left;">Civilization,Fantasy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">El Caballero</td>
+<td style="text-align: left;">Exploration</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Elfenland</td>
+<td style="text-align: left;">Fantasy,Travel</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="selecting-rows" class="slide level2">
+<h2>Selecting rows</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`, 
+`attributes.boardgamecategory`
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `attributes.boardgamecategory` <span class="kw">like</span> <span class="st">&#39;%nautical%&#39;</span>
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgamecategory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Mare Mediterraneum</td>
+<td style="text-align: left;">Civilization,Nautical</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Broadsides and Boarding Parties</td>
+<td style="text-align: left;">Nautical,Pirates,Wargame</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cape Horn</td>
+<td style="text-align: left;">Nautical,Racing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kontor</td>
+<td style="text-align: left;">City Building,Nautical,Renaissance</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Serenissima (first edition)</td>
+<td style="text-align: left;">Economic,Nautical,Renaissance</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blackbeard</td>
+<td style="text-align: left;">Adventure,Age of Reason,Nautical,Pirates,Wargame</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wooden Ships &amp; Iron Men</td>
+<td style="text-align: left;">Age of Reason,American Indian Wars,American Revolutionary War,Napoleonic,Nautical,Pirates,Post-Napoleonic,Wargame</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lifeboats</td>
+<td style="text-align: left;">Nautical,Negotiation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mississippi Queen</td>
+<td style="text-align: left;">Nautical,Racing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Atlantic Storm</td>
+<td style="text-align: left;">Card Game,Nautical,World War II</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="selecting-rows-1" class="slide level2">
+<h2>Selecting rows</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`
+,`attributes.boardgamecategory`
+,`details.maxplayers`
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `attributes.boardgamecategory` <span class="kw">like</span> <span class="st">&#39;%nautical%&#39;</span>
+<span class="kw">and</span> `details.maxplayers` = <span class="dv">2</span> 
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgamecategory</th>
+<th style="text-align: right;">details.maxplayers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Broadsides and Boarding Parties</td>
+<td style="text-align: left;">Nautical,Pirates,Wargame</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Wooden Ships &amp; Iron Men</td>
+<td style="text-align: left;">Age of Reason,American Indian Wars,American Revolutionary War,Napoleonic,Nautical,Pirates,Post-Napoleonic,Wargame</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Breakthru</td>
+<td style="text-align: left;">Abstract Strategy,Nautical</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pacific Victory</td>
+<td style="text-align: left;">Nautical,Wargame,World War II</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Midway</td>
+<td style="text-align: left;">Nautical,Wargame,World War II</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Guadalcanal</td>
+<td style="text-align: left;">Nautical,Wargame,World War II</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Attack Sub</td>
+<td style="text-align: left;">Card Game,Modern Warfare,Nautical,Wargame</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">War at Sea (second edition)</td>
+<td style="text-align: left;">Nautical,Wargame,World War II</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Victory in the Pacific</td>
+<td style="text-align: left;">Nautical,Wargame,World War II</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Broadside</td>
+<td style="text-align: left;">Miniatures,Nautical,Wargame</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="identifying-missings" class="slide level2">
+<h2>Identifying missings</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`
+,`attributes.boardgameartist`
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `attributes.boardgameartist` <span class="kw">is</span> <span class="kw">null</span>
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgameartist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gateway to the Stars</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Supremacy</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brauerei</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Conquest</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bollox</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MedFront</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Quebec 1759</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Star Wars: Episode 1 – Clash of the Lightsabers</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Broadsides and Boarding Parties</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="exercise-1" class="slide level2">
+<h2>Exercise</h2>
+<ol type="1">
+<li>Find all games with a <code>details.minage</code> of 16 or greater</li>
+<li>Find all records where either the <code>attributes.boardgamedesigner</code> is missing or the <code>attributes.boardgameartist</code> is missing</li>
+</ol>
+</section><section id="answers-1" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name`
+,`details.minage`
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `details.minage` &gt;= <span class="dv">16</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: right;">details.minage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Frischfleisch</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Metropolis</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Junta</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1835</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Grass</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">True Colors</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kampf um Rom</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Putsch</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Minos</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ultimate Outburst</td>
+<td style="text-align: right;">18</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="answers-2" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+ `details.name`
+,`attributes.boardgamedesigner`
+,`attributes.boardgameartist` 
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `attributes.boardgamedesigner` <span class="kw">is</span> <span class="kw">null</span> 
+<span class="kw">or</span> `attributes.boardgameartist` <span class="kw">is</span> <span class="kw">null</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">attributes.boardgamedesigner</th>
+<th style="text-align: left;">attributes.boardgameartist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: left;">Christian Beierer</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gateway to the Stars</td>
+<td style="text-align: left;">Mark A. Snowden</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Supremacy</td>
+<td style="text-align: left;">Robert J. Simpson</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brauerei</td>
+<td style="text-align: left;">Valentin Herman</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Conquest</td>
+<td style="text-align: left;">Donald Benge</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bollox</td>
+<td style="text-align: left;">Rob Nelson</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MedFront</td>
+<td style="text-align: left;">Craig Besinque</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Quebec 1759</td>
+<td style="text-align: left;">Steve Brewster,Tom Dalgliesh,Lance Gutteridge</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Star Wars: Episode 1 – Clash of the Lightsabers</td>
+<td style="text-align: left;">Craig Van Ness</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Broadsides and Boarding Parties</td>
+<td style="text-align: left;">Larry Harris, Jr.</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section></section>
+<section><section id="altering-columns" class="titleslide slide level1"><h1>Altering columns</h1></section><section id="renaming-columns" class="slide level2">
+<h2>Renaming columns</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name` <span class="kw">as</span> `name`
+<span class="kw">from</span> boardgames
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Die Macher</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dragonmaster</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Samurai</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tal der Könige</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acquire</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mare Mediterraneum</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cathedral</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lords of Creation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">El Caballero</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Elfenland</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="calculated-columns" class="slide level2">
+<h2>Calculated columns</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.name` ,<span class="fu">substr</span>(`attributes.boardgamecategory`, <span class="dv">1</span>,<span class="dv">10</span>) <span class="kw">as</span> short_category
+, <span class="fl">1.2</span> <span class="kw">as</span> fixed_colum
+, <span class="kw">coalesce</span>(`attributes.boardgameartist`,<span class="ot">&quot;Unknown&quot;</span>) <span class="kw">as</span> arttist
+,<span class="kw">case</span> <span class="kw">when</span> `attributes.boardgamecategory` <span class="kw">like</span> <span class="st">&#39;%nautical%&#39;</span> <span class="kw">then</span> <span class="st">&#39;Boats, boats, boats!&#39;</span>
+<span class="kw">when</span> `attributes.boardgamecategory` <span class="kw">like</span> <span class="st">&#39;%pirate%&#39;</span> <span class="kw">then</span> <span class="st">&#39;R!&#39;</span> 
+<span class="kw">else</span> <span class="st">&#39;Who cares?&#39;</span> <span class="kw">end</span> <span class="kw">as</span> <span class="kw">category</span>
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `attributes.boardgameartist` <span class="kw">is</span> <span class="kw">null</span>
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: left;">short_category</th>
+<th style="text-align: right;">fixed_colum</th>
+<th style="text-align: left;">arttist</th>
+<th style="text-align: left;">category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tal der Könige</td>
+<td style="text-align: left;">Ancient</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gateway to the Stars</td>
+<td style="text-align: left;">Civilizati</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Supremacy</td>
+<td style="text-align: left;">Economic,P</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brauerei</td>
+<td style="text-align: left;">Economic</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Conquest</td>
+<td style="text-align: left;">Abstract S</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bollox</td>
+<td style="text-align: left;">Abstract S</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MedFront</td>
+<td style="text-align: left;">Wargame,Wo</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Quebec 1759</td>
+<td style="text-align: left;">Age of Rea</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Star Wars: Episode 1 – Clash of the Lightsabers</td>
+<td style="text-align: left;">Card Game,</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Who cares?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Broadsides and Boarding Parties</td>
+<td style="text-align: left;">Nautical,P</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">Boats, boats, boats!</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section></section>
+<section><section id="aggregating-data" class="titleslide slide level1"><h1>Aggregating data</h1></section><section id="grouping-data" class="slide level2">
+<h2>Grouping data</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.maxplayers` <span class="kw">as</span> max_players
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `details.maxplayers` <span class="kw">is</span> <span class="kw">not</span> <span class="kw">null</span>
+<span class="kw">group</span> <span class="kw">by</span> `details.maxplayers`</code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">max_players</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="aggregates" class="slide level2">
+<h2>Aggregates</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+`details.maxplayers` <span class="kw">as</span> max_players
+,<span class="fu">count</span>(*) <span class="kw">as</span> n
+,<span class="fu">avg</span>(`details.playingtime`) <span class="kw">as</span> avg_playtime
+,<span class="fu">avg</span>(`details.playingtime`)/`details.maxplayers` <span class="kw">as</span> pp_avg_playtime
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `details.maxplayers` <span class="kw">is</span> <span class="kw">not</span> <span class="kw">null</span>
+<span class="kw">group</span> <span class="kw">by</span> `details.maxplayers`
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">max_players</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">avg_playtime</th>
+<th style="text-align: right;">pp_avg_playtime</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">6706</td>
+<td style="text-align: right;">16.45064</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">1095</td>
+<td style="text-align: right;">45.00365</td>
+<td style="text-align: right;">45.003653</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">18683</td>
+<td style="text-align: right;">63.22983</td>
+<td style="text-align: right;">31.614917</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">1198</td>
+<td style="text-align: right;">63.83472</td>
+<td style="text-align: right;">21.278242</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">26287</td>
+<td style="text-align: right;">42.37920</td>
+<td style="text-align: right;">10.594800</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">7391</td>
+<td style="text-align: right;">56.87674</td>
+<td style="text-align: right;">11.375348</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">17435</td>
+<td style="text-align: right;">54.21480</td>
+<td style="text-align: right;">9.035800</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">1040</td>
+<td style="text-align: right;">92.12019</td>
+<td style="text-align: right;">13.160027</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">5020</td>
+<td style="text-align: right;">59.03008</td>
+<td style="text-align: right;">7.378760</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">326</td>
+<td style="text-align: right;">68.45706</td>
+<td style="text-align: right;">7.606339</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="exercises" class="slide level2">
+<h2>Exercises</h2>
+<ol type="1">
+<li>How many games received ratings of 0,1,2,…,10 etc based on the `<code>stats.average</code> col? (Hint: Use the <code>floor()</code> function)</li>
+<li>For records with the <code>game.type</code> of ‘boardgameexpansion’ what is the minimum, mean, and maximum of users who have said they want the expansion (<code>stats.wanted</code>)?</li>
+</ol>
+</section><section id="answers-3" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+<span class="fu">floor</span>(`stats.average`) <span class="kw">as</span> rating
+, <span class="fu">count</span>(*) <span class="kw">as</span> games
+<span class="kw">from</span> boardgames
+<span class="kw">group</span> <span class="kw">by</span>  <span class="fu">floor</span>(`stats.average`)</code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">rating</th>
+<th style="text-align: right;">games</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">24662</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">777</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">1362</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">3571</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">8025</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">15401</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">19054</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">14480</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">2425</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">313</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="answers-4" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> <span class="fu">avg</span>(`stats.wishing` ) <span class="kw">as</span> avg_want
+,<span class="fu">min</span>(`stats.wishing`) <span class="kw">as</span> min_want
+,<span class="fu">max</span>(`stats.wishing`) <span class="kw">as</span> max_want
+<span class="kw">from</span> boardgames
+<span class="kw">where</span> `game.type`=<span class="st">&#39;boardgameexpansion&#39;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">avg_want</th>
+<th style="text-align: right;">min_want</th>
+<th style="text-align: right;">max_want</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">38.6148628938156</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2500</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section></section>
+<section><section id="combining-datasets" class="titleslide slide level1"><h1>Combining datasets</h1></section><section id="combination-types---inner-join" class="slide level2">
+<h2>Combination types - inner join</h2>
+<p>Use when you need only stuff that matches on both sides</p>
+<p><img src="https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/inner-join.gif?raw=true" alt="inner join" /></p>
+</section><section id="combination-types---left-join" class="slide level2">
+<h2>Combination types - left join</h2>
+<p>Use when you you need to get potentially optional values from another table</p>
+<p><img src="https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/left-join.gif?raw=true" alt="left join" /></p>
+</section><section id="combination-types---union-all" class="slide level2">
+<h2>Combination types - union (all)</h2>
+<p>Use when you you need to combine two separate datasets with the same structure</p>
+<p><img src="https://github.com/gadenbuie/tidy-animated-verbs/blob/master/images/union.gif?raw=true" alt="union" /></p>
+</section><section id="writing-joins" class="slide level2">
+<h2>Writing joins</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+b.`details.name`
+,t.`topics(bgg.ldaout)`
+<span class="kw">from</span> boardgames b
+<span class="kw">inner</span> <span class="kw">join</span> `bgg.ldaOut.topics` t <span class="kw">on</span> b.`details.name`=t.row_names
+<span class="kw">limit</span> <span class="dv">10</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">details.name</th>
+<th style="text-align: right;">topics(bgg.ldaOut)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Dragonmaster</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Samurai</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Acquire</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cathedral</td>
+<td style="text-align: right;">24</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Elfenland</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bohnanza</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ra</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Catan</td>
+<td style="text-align: right;">23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Basari</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MarraCash</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="exercises-1" class="slide level2">
+<h2>Exercises</h2>
+<ol type="1">
+<li>Use a join to return any board games without a topic entry, turn the count of records</li>
+<li>Can you transform the board game name column so that more entries get joined together? (Hint: Use the replace() function)</li>
+</ol>
+</section><section id="answers-5" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+<span class="fu">count</span>(*)
+<span class="kw">from</span> boardgames b
+<span class="kw">left</span> <span class="kw">join</span> `bgg.ldaOut.topics` t <span class="kw">on</span> b.`details.name`=t.row_names
+<span class="kw">where</span> t.row_names <span class="kw">is</span> <span class="kw">null</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">count(*)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">82636</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section><section id="answers-6" class="slide level2">
+<h2>Answers</h2>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> 
+<span class="fu">count</span>(*)
+<span class="kw">from</span> boardgames b
+<span class="kw">left</span> <span class="kw">join</span> `bgg.ldaOut.topics` t <span class="kw">on</span> <span class="kw">replace</span>(b.`details.name`,<span class="st">&#39; &#39;</span>,<span class="st">&#39;.&#39;</span>)=t.row_names
+<span class="kw">where</span> t.row_names <span class="kw">is</span> <span class="kw">null</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">count(*)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">69169</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section></section>
+<section><section id="wrapup" class="titleslide slide level1"><h1>Wrapup</h1></section><section id="other-keywords-to-learn" class="slide level2">
+<h2>Other keywords to learn</h2>
+<ul>
+<li>order by</li>
+<li>having</li>
+<li>cross apply</li>
+<li>with</li>
+</ul>
+</section><section id="typical-execution-order-of-keywords" class="slide level2">
+<h2>Typical execution order of keywords</h2>
+<ol type="1">
+<li>from</li>
+<li>joins</li>
+<li>where</li>
+<li>group by</li>
+<li>having</li>
+<li>select</li>
+<li>order by</li>
+<li>limit</li>
+</ol>
+</section><section id="ways-to-learn-sql" class="slide level2">
+<h2>Ways to learn SQL</h2>
+<ol type="1">
+<li>Writing it</li>
+<li>Reading other people’s code</li>
+<li>Using <code>dbplyr</code> and checking the code it’s written</li>
+<li>The SQL Cookbook geni.us/sqlcookbook</li>
+</ol>
+</section><section id="qa" class="slide level2">
+<h2>Q&amp;A</h2>
+</section><section id="followup" class="slide level2">
+<h2>Followup</h2>
+<ol type="1">
+<li>Get the slides itsalocke.com/talks</li>
+<li>Contact me <span class="citation" data-cites="theStephLocke">@theStephLocke</span> <a href="mailto:steph@itsalocke.com">steph@itsalocke.com</a></li>
+</ol>
+</section></section>
+    </div>
+  </div>
+
+  <script src="sqlintro_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="sqlintro_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: false,
+        // Transition style
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: '1920',
+        height: '1080',
+        // Factor of the display size that should remain empty around the content
+        margin: '0.05',
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>
